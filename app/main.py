@@ -7,8 +7,8 @@ def main():
     client, addr = server_socket.accept()
     data: str = client.recv(1024).decode()
     request_data: list[str] = data.split("\r\n")
-    string:list[str] =request_data[0].split("/")[2]
-    if request_data[0].split(" ")[1] == "/echo/{str}":
+    string:list[str] =request_data[0].split("/")
+    if request_data[0].split(" ")[1] == "/echo/{string[2]}":
         response: bytes = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length:{len(str)}\r\n\r\n{str}\r\n".encode()
     elif request_data[0].split(" ")[1] !="/":
         response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
