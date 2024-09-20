@@ -15,7 +15,11 @@ def main():
             print(f"Connection from {addr}")
             
             # Send a simple HTTP response
-            client_socket.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+            data=client_socket.recv(1024)
+            if data:
+                client_socket.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+            else:
+                client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
             client_socket.close()  # Close the client connection
         except Exception as e:
             print(f"Error: {e}")
