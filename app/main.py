@@ -9,8 +9,9 @@ def main():
     request_data: list[str] = data.split("\r\n")
     string:list[str] = request_data[0].split("/")
     echo_string=f"/echo/{string[2]}"
-    if request_data[0].split(" ")[1] == echo_string:
-        response: bytes = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length:{len(echo_string)}\r\n\r\n{echo_string}\r\n".encode()
+    spit_string=echo_string.split(" ")[1]
+    if request_data[0].split(" ")[1] == spit_string_string:
+        response: bytes = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length:{len(spit_string)}\r\n\r\n{spit_string}\r\n".encode()
     elif request_data[0].split(" ")[1] !="/":
         response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
     else :
