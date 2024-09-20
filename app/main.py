@@ -1,28 +1,17 @@
 import socket
-
 def main():
-    print("Logs from your program will appear here!")
-    
-    # Create the server socket
-    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    
-    print("Server is listening on port 4221...")
-    
-    while True:
-        try:
-            # Accept a new connection
-            client_socket, addr = server_socket.accept()
-            print(f"Connection from {addr}")
-            
-            # Send a simple HTTP response
-            data=client_socket.recv(1024)
-            if data:
-                client_socket.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
-            else:
-                client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
-            client_socket.close()  # Close the client connection
-        except Exception as e:
-            print(f"Error: {e}")
-
+    server_socket: socket.socket = socket.create_server(
+        ("localhost", 4221), reuse_port=True
+    )
+    client: socket.socket
+    client, addr = server_socket.accept()
+    data: str = client.recv(1024).decode()
+    request_data: list[str] = data.split("\r\n")
+    response: bytes = "HTTP/1.1 200 OK\r\n\r\n".encode()
+    if request_data[0].split(" ")[1] != "/":
+        response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+    client.send(response)
+    client.close()
+    server_socket.close()
 if __name__ == "__main__":
     main()
