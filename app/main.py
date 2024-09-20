@@ -7,15 +7,20 @@ def main():
     client, addr = server_socket.accept()
     data: str = client.recv(1024).decode()
     request_data: list[str] = data.split("\r\n")
-    string:list[str] = request_data[0].split(" ")
-    echo_string=string[1].split("/")[1]
-    spit_string=f"/echo/{echo_string}"
-    if request_data[0].split(" ")[1] == spit_string:
-        response: bytes = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length:{len(echo_string)}\r\n\r\n{echo_string}\r\n".encode()
-    elif request_data[0].split(" ")[1] !="/":
+    path_parts: list[str] = request_data[0].split(" ")[1].split("/")
+    if len(path_parts) > 2 and path_parts[1] == "echo":  # Check if the path is like /echo/{something}
+        string_to_echo = path_parts[2]  # The part after /echo/
+        response_body = string_to_echo
+        response: bytes = (
+        f"HTTP/1.1 200 OK\r\n"
+        f"Content-Type: text/plain\r\n"
+        f"Content-Length: {len(response_body)}\r\n\r\n"
+        f"{response_body}\r\n"
+        ).encode()
+    elif request_data[0].split(" ")[1] != "/":
         response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
-    else :
-        response:bytes="HTTP/1.1 200 OK\r\n".encode()
+    else:
+        response: bytes = "HTTP/1.1 200 OK\r\n".encode()
     client.send(response)
     client.close()
     server_socket.close()
