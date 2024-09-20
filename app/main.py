@@ -7,7 +7,7 @@ def main():
     client, addr = server_socket.accept()
     data: str = client.recv(1024).decode()
     request_data: list[str] = data.split("\r\n")
-    str=request_data[0].split("/")[1]
+    str=request_data[0].split("/")[2]
     if request_data[0].split(" ")[1] == "/echo/{str}":
         response: bytes = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length:{len(str)}\r\n\r\n{str}\r\n".encode()
     elif request_data[0].split(" ")[1] !="/":
