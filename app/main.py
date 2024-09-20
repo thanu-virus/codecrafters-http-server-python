@@ -19,6 +19,15 @@ def main():
         ).encode()
     elif request_data[0].split(" ")[1] != "/":
         response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+    elif request_data[2] != "" and path_parts[1]=="user-agent":
+        string_to_echo = request_data[2].split(" ")[1]# The part after /echo/
+        response_body = string_to_echo
+        response: bytes = (
+        f"HTTP/1.1 200 OK\r\n"
+        f"Content-Type: text/plain\r\n"
+        f"Content-Length: {len(response_body)}\r\n\r\n"
+        f"{response_body}\r\n"
+        ).encode()
     else:
         response: bytes = "HTTP/1.1 200 OK\r\n\r\n".encode()
     client.send(response)
