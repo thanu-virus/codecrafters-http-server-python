@@ -20,7 +20,7 @@ def main():
     elif request_data[0].split(" ")[1] != "/":
         response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
     else:
-        response: bytes = "HTTP/1.1 200 OK\r\n".encode()
+        response: bytes = "HTTP/1.1 200 OK\r\n\r\n".encode()
     client.send(response)
     client.close()
     server_socket.close()
