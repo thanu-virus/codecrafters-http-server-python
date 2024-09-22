@@ -8,7 +8,7 @@ def main():
 
     while True:
         client, addr = server_socket.accept()
-        threading.Thread(args=(conn, addr)).start()
+        threading.Thread(args=(client, addr)).start()
         data: str = client.recv(1024).decode()
         
         if not data:
