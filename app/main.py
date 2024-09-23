@@ -42,7 +42,7 @@ def handle_client(client_socket: socket.socket):
         response: bytes = (
                 f"HTTP/1.1 200 OK\r\n"
                 f"Content-Type: application/octet-stream\r\n"
-                f"Content-Length: {len(response_body)}\r\n\r\n"
+                f"Content-Length: {len(response_body)*2+4}\r\n\r\n"
                 f"{response_body}\r\n"
             ).encode()
 
