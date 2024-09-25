@@ -17,11 +17,10 @@ def main():
                 try:
                     with open(f"{directory}/{filename}", "w") as f:
                         body = f.write(contents)
-                    response = f"HTTP/1.1 201 created\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
+                    response = f"HTTP/1.1 201 Created\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
                 except Exception as e:
                     response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
-
-            if path == "/":
+            elif path == "/":
                 response = "HTTP/1.1 200 OK\r\n\r\n".encode()
             elif path.startswith("/echo"):
                 response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
@@ -35,7 +34,7 @@ def main():
                 try:
                     with open(f"{directory}/{filename}", "r") as f:
                         body = f.read()
-                    response = f"GET /files/{filename} HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
+                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
                 except Exception as e:
                     response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
             else:
