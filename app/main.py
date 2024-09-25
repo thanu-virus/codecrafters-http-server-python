@@ -17,7 +17,7 @@ def main():
                 try:
                     with open(f"{directory}/{filename}", "w") as f:
                         body = f.write(contents)
-                    response = f"HTTP/1.1 201 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
+                    response = f"HTTP/1.1 201 created\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
                 except Exception as e:
                     response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
@@ -35,7 +35,7 @@ def main():
                 try:
                     with open(f"{directory}/{filename}", "r") as f:
                         body = f.read()
-                    response= "HTTP/1.1 201 Created\r\n\r\n".encode()
+                    response = f"GET /files/{filename} HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
                 except Exception as e:
                     response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
             else:
