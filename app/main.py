@@ -8,6 +8,18 @@ def main():
             data = client.recv(1024).decode()
             req = data.split("\r\n")
             path = req[0].split(" ")[1]
+            pathb=req[0].split(" ")[0]
+            if pathb=="POST":
+                directory = sys.argv[2]
+                filename = path[7:]
+                content=req[-1]
+                print(directory, filename)
+                try:
+                    with open(f"{directory}/{filename}", "w") as f:
+                        body = f.write(contents)
+                    response = f"HTTP/1.1 201 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
+                except Exception as e:
+                    response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
             if path == "/":
                 response = "HTTP/1.1 200 OK\r\n\r\n".encode()
@@ -23,7 +35,7 @@ def main():
                 try:
                     with open(f"{directory}/{filename}", "r") as f:
                         body = f.read()
-                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
+                    response= "HTTP/1.1 201 Created\r\n\r\n".encode()
                 except Exception as e:
                     response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
             else:
