@@ -1,44 +1,57 @@
 import socket
 import threading
-import os
+import sys
 
-# Function to handle client requests
-def handle_client(client_socket: socket.socket):
-    data: str = client_socket.recv(1024).decode()
+def main():
+    def handle_req(client, addr):
+        try:
+            data = client.recv(1024).decode()
+            req = data.split("\r\n")
+            path = req[0].split(" ")[1]
 
-    if not data:
-        client_socket.close()
-        return
+            if path == "/":
+                response = "HTTP/1.1 200 OK\r\n\r\n".encode()
+            elif path.startswith("/echo"):
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+            elif path.startswith("/user-agent"):
+                user_agent = req[2].split(": ")[1]
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent)}\r\n\r\n{user_agent}".encode()
+            elif path.startswith("/files"):
+                directory = sys.argv[2]
+                filename = path[7:]
+                print(directory, filename)
+                try:
+                    with open(f"{directory}/{filename}", "r") as f:
+                        body = f.read()
+                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode()
+                except Exception as e:
+                    response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
+            else:
+                response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
-    request_data: list[str] = data.split("\r\n")
-    path_parts: list[str] = request_data[0].split(" ")[1].split("/")
+            client.send(response)
+        except Exception as e:
+            print(f"Error handling request from {addr}: {e}")
+        finally:
+            client.close()
 
-    # Handle /echo/{something}
-    if len(path_parts) > 2 and path_parts[1] == "echo":
-        string_to_echo = path_parts[2]  # The part after /echo/
-        response_body = string_to_echo
-        response: bytes = (
-            f"HTTP/1.1 200 OK\r\n"
-            f"Content-Type: text/plain\r\n"
-            f"Content-Length: {len(response_body)}\r\n\r\n"
-            f"{response_body}\r\n"
-        ).encode()
+    try:
+        # Manually create a socket
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Allow address reuse
+        server_socket.bind(("localhost", 4221))
+        server_socket.listen(5)  # Allow 5 pending connections
+        print("Server running on http://localhost:4221")
+    except Exception as e:
+        print(f"Error creating server: {e}")
+        sys.exit(1)
 
-    # Handle /user-agent and extract the User-Agent header
-    elif len(path_parts) > 1 and path_parts[1] == "user-agent":
-        user_agent_header = next(
-            (header for header in request_data if header.startswith("User-Agent:")), 
-            None
-        )
-        if user_agent_header:
-            response_body = user_agent_header.split(": ", 1)[1]
-            response: bytes = (
-                f"HTTP/1.1 200 OK\r\n"
-                f"Content-Type: text/plain\r\n"
-                f"Content-Length: {len(response_body)}\r\n\r\n"
-                f"{response_body}\r\n"
-            ).encode()
+    while True:
+        try:
+            client, addr = server_socket.accept()
+            threading.Thread(target=handle_req, args=(client, addr)).start()
+        except Exception as e:
+            print(f"Error accepting client: {e}")
 
-    # Handle /files/{filename} to serve file content
-    elif len(path_parts) > 2 and path_parts[1] == "files":
-        file_path = "/".join(path_parts[2:])  # Get the file
+if __name__ == "__main__":
+    main()
