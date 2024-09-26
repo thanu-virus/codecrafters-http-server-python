@@ -36,7 +36,9 @@ def main():
                     feq="Accept-Encoding:"
                     if req[2].split(" ")[0]==feq:
                         codType=req[2].split(":")
-                        response = f"HTTP/1.1 200 OK\r\nContent-Encoding: {codType[1]}\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+                        codType2=codType[1].split(",")
+                        if " gzip" in codType2:
+                            response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                     else:
                         response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                 
