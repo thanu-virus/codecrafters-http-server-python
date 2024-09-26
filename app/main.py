@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import gzip
+import io
 
 def main():
     def handle_req(client, addr):
@@ -27,29 +28,34 @@ def main():
                     response = f"HTTP/1.1 201 Created\r\nContent-Type: text/plain\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}".encode()
                 except Exception as e:
                     response = f"HTTP/1.1 500 Internal Server Error\r\n\r\n".encode()
-            
+
             # Handle GET request (Homepage or file access)
             elif method == "GET":
                 if path == "/":
                     response = "HTTP/1.1 200 OK\r\n\r\nWelcome to the server!".encode()
-                
+
+                # Handle the /echo endpoint with Gzip compression
                 elif path.startswith("/echo"):
-                    feq="Accept-Encoding:"
-                    if req[2].split(" ")[0]==feq:
-                        codType=req[2].split(":")
-                        codType2=codType[1].split(",")
-                        if " gzip" in codType2:
-                            compp=gzip.compress(path[6:])
-                            response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{compp}".encode()
-                        else:
-                            response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+                    content = path[6:]  # Echo content after "/echo"
+
+                    # Check for Accept-Encoding header and Gzip support
+                    accept_encoding_header = next((h for h in req if h.startswith("Accept-Encoding:")), "")
+                    if "gzip" in accept_encoding_header:
+                        # Compress the content using Gzip
+                        buf = io.BytesIO()
+                        with gzip.GzipFile(fileobj=buf, mode='wb') as gz:
+                            gz.write(content.encode())
+
+                        gzipped_content = buf.getvalue()
+                        response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(gzipped_content)}\r\n\r\n".encode() + gzipped_content
                     else:
-                        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
-                
+                        # No Gzip compression
+                        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(content)}\r\n\r\n{content}".encode()
+
                 elif path.startswith("/user-agent"):
                     user_agent = req[2].split(": ")[1]
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent)}\r\n\r\n{user_agent}".encode()
-                
+
                 elif path.startswith("/files"):
                     directory = sys.argv[2]
                     filename = path[7:]  # Extract filename from URL
@@ -63,8 +69,8 @@ def main():
                         response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
             # Handle unknown methods or invalid paths
-                else:
-                    response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+            else:
+                response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
             # Send the response back to the client
             client.send(response)
