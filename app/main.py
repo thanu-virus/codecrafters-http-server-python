@@ -39,8 +39,7 @@ def main():
                         codType=req[2].split(":")
                         codType2=codType[1].split(",")
                         if " gzip" in codType2:
-                            ennco=gzip(path[6:])
-                            response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{ennco}".encode()
+                            response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                         else:
                             response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                     else:
