@@ -34,10 +34,10 @@ def main():
                 
                 elif path.startswith("/echo"):
                     feq="Accept-Encoding:  gzip"
-                    if req[-2]==feq:
+                    if req[-1]==feq:
                         response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                     else:
-                        response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+                        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                 
                 elif path.startswith("/user-agent"):
                     user_agent = req[2].split(": ")[1]
