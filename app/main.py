@@ -33,7 +33,11 @@ def main():
                     response = "HTTP/1.1 200 OK\r\n\r\nWelcome to the server!".encode()
                 
                 elif path.startswith("/echo"):
-                    response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+                    feq="Accept-Encoding: gzip"
+                    if req[-2]==feq:
+                        response = f"HTTP/1.1 200 OK\r\n{feq}\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+                    else:
+                        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                 
                 elif path.startswith("/user-agent"):
                     user_agent = req[2].split(": ")[1]
