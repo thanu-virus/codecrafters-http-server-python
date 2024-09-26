@@ -69,8 +69,8 @@ def main():
                         response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
             # Handle unknown methods or invalid paths
-            else:
-                response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+                else:
+                    response = "HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
             # Send the response back to the client
             client.send(response)
