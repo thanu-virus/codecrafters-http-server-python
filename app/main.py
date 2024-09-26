@@ -33,9 +33,9 @@ def main():
                     response = "HTTP/1.1 200 OK\r\n\r\nWelcome to the server!".encode()
                 
                 elif path.startswith("/echo"):
-                    feq="Accept-Encoding: gzip"
+                    feq="Accept-Encoding:  gzip"
                     if req[-2]==feq:
-                        response = f"HTTP/1.1 200 OK\r\n{feq}\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
+                        response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                     else:
                         response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(path[6:])}\r\n\r\n{path[6:]}".encode()
                 
